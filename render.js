@@ -1,6 +1,6 @@
 // Turning messages into DOM: markdown, pictures, sources, errors.
-import { marked } from '../vendor/marked.esm.js';
-import DOMPurify from '../vendor/purify.es.mjs';
+import { marked } from './marked.esm.js';
+import DOMPurify from './purify.es.mjs';
 import { esc, fmtUSD, fmtDuration } from './util.js';
 import { displayName } from './models.js';
 import { attSummary } from './files.js';

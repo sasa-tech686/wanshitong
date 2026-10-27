@@ -7,7 +7,7 @@ const MAX_DOC_CHARS = 120000;
 const MAX_PDF_TEXT_PAGES = 80;
 const MAX_PDF_PAGE_IMAGES = 6;
 
-const vendor = (p) => new URL('../vendor/' + p, import.meta.url).href;
+const vendor = (p) => new URL('./' + p, import.meta.url).href;
 
 export async function processFile(file, onStatus) {
   const name = file.name || '文件';
@@ -76,9 +76,9 @@ async function imageAtt(file) {
 let pdfjsP = null;
 function getPdfjs() {
   if (!pdfjsP) {
-    pdfjsP = import('../vendor/pdfjs/pdf.min.mjs')
+    pdfjsP = import('./pdf.min.mjs')
       .then((lib) => {
-        lib.GlobalWorkerOptions.workerSrc = vendor('pdfjs/pdf.worker.min.mjs');
+        lib.GlobalWorkerOptions.workerSrc = vendor('pdf.worker.min.mjs');
         return lib;
       })
       .catch((e) => {
@@ -93,7 +93,7 @@ async function pdfAtt(file, onStatus) {
   onStatus && onStatus('正在读 PDF…');
   const lib = await getPdfjs();
   const data = new Uint8Array(await file.arrayBuffer());
-  const base = vendor('pdfjs/');
+  const base = vendor(''); // everything sits in one folder
   let doc;
   try {
     doc = await lib.getDocument({
@@ -101,9 +101,9 @@ async function pdfAtt(file, onStatus) {
       // Chinese/Japanese/Korean character maps (169 small files) load from the pdf.js package on jsDelivr when a PDF needs them.
       cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/cmaps/',
       cMapPacked: true,
-      standardFontDataUrl: base + 'standard_fonts/',
-      wasmUrl: base + 'wasm/',
-      iccUrl: base + 'iccs/',
+      standardFontDataUrl: base,
+      wasmUrl: base,
+      iccUrl: base,
       isEvalSupported: false,
     }).promise;
   } catch (e) {

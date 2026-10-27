@@ -1,25 +1,25 @@
 // 万事通 service worker: keeps the app shell available offline. AI requests always go straight to the network.
-const VERSION = 'wst-1.0.1';
+const VERSION = 'wst-1.0.2';
 const CORE = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './css/app.css',
-  './js/main.js',
-  './js/util.js',
-  './js/store.js',
-  './js/models.js',
-  './js/api.js',
-  './js/files.js',
-  './js/agent.js',
-  './js/render.js',
-  './js/voice.js',
-  './vendor/marked.esm.js',
-  './vendor/purify.es.mjs',
-  './fonts/brand-serif.woff2',
-  './icons/icon-192.png',
-  './icons/apple-touch-icon.png',
-  './icons/favicon-64.png',
+  './app.css',
+  './main.js',
+  './util.js',
+  './store.js',
+  './models.js',
+  './api.js',
+  './files.js',
+  './agent.js',
+  './render.js',
+  './voice.js',
+  './marked.esm.js',
+  './purify.es.mjs',
+  './brand-serif.woff2',
+  './icon-192.png',
+  './apple-touch-icon.png',
+  './favicon-64.png',
 ];
 
 self.addEventListener('install', (event) => {

@@ -1,7 +1,7 @@
 /* 万事通 — jade on cool paper. One screen: top bar, scrolling chat, composer docked to the bottom. */
 @font-face {
   font-family: 'WSTBrand';
-  src: url('../fonts/brand-serif.woff2') format('woff2');
+  src: url('brand-serif.woff2') format('woff2');
   font-display: swap;
   unicode-range: U+4E07, U+4E8B, U+901A;
 }
