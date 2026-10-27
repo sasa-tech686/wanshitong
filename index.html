@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>万事通</title>
+<meta name="description" content="你的全能 AI 助理：聊天、语音对话、看图读文件、画图、上网查资料。">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob:; connect-src 'self' https: http: data: blob:; font-src 'self' data:; worker-src 'self' blob:; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="theme-color" content="#F4F7F5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C1311" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="万事通">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="stylesheet" href="css/app.css">
+<link rel="modulepreload" href="js/main.js">
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <button id="btnMenu" class="icon-btn" type="button" aria-label="对话列表">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h11M4 17h16"/></svg>
+    </button>
+    <button id="btnModel" class="model-chip" type="button" aria-label="选择 AI 模型">
+      <span id="modelName">万事通</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>
+    </button>
+    <button id="btnNew" class="icon-btn" type="button" aria-label="新对话">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </header>
+
+  <main id="chat" class="chat">
+    <section id="empty" class="empty" hidden>
+      <div class="seal" aria-hidden="true"><span>万</span></div>
+      <h1 class="brand">万事通</h1>
+      <p class="tagline">问什么都可以：讲话、拍照、丢文件、叫它画图、上网查。</p>
+      <div id="setupCard" class="setup-card" hidden>
+        <h2>先接上 AI</h2>
+        <p>填入你的 OpenRouter 钥匙就能开始。钥匙只存在这部手机里。</p>
+        <label class="field">
+          <span>OpenRouter 钥匙</span>
+          <input id="setupKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-or-v1-…" inputmode="text">
+        </label>
+        <div class="row">
+          <button id="setupSave" class="btn" type="button">保存并测试</button>
+          <a class="btn ghost" href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">去拿钥匙</a>
+        </div>
+        <p id="setupMsg" class="note" hidden></p>
+      </div>
+      <div id="suggest" class="suggest"></div>
+    </section>
+    <div id="msgs" class="msgs" aria-live="polite"></div>
+  </main>
+
+  <button id="btnScrollDown" class="scroll-down" type="button" aria-label="跳到最新" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+  </button>
+
+  <footer class="composer-wrap">
+    <div id="modeChips" class="mode-chips" hidden></div>
+    <div id="attRow" class="att-row" hidden></div>
+    <div id="composer" class="composer">
+      <button id="btnPlus" class="icon-btn round" type="button" aria-label="添加照片、文件或功能">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <textarea id="input" rows="1" placeholder="问万事通…" enterkeyhint="send" autocomplete="off" aria-label="输入消息"></textarea>
+      <button id="btnMic" class="icon-btn round" type="button" aria-label="讲话打字">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+      </button>
+      <button id="btnVoice" class="voice-btn" type="button" aria-label="语音对话">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>
+      </button>
+      <button id="btnSend" class="send-btn" type="button" aria-label="发送" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+      </button>
+      <button id="btnStop" class="send-btn stop" type="button" aria-label="停止" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+      </button>
+    </div>
+    <div id="recBar" class="rec-bar" hidden>
+      <button id="recCancel" class="icon-btn round" type="button" aria-label="取消录音">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="rec-mid">
+        <canvas id="recWave" height="36"></canvas>
+        <span id="recLabel" class="rec-label">在听…</span>
+      </div>
+      <span id="recTime" class="rec-time">0:00</span>
+      <button id="recDone" class="send-btn" type="button" aria-label="讲完了">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+      </button>
+    </div>
+  </footer>
+</div>
+
+<!-- conversation list -->
+<div id="drawer" class="drawer" hidden>
+  <div class="scrim" data-close="drawer"></div>
+  <aside class="drawer-panel" aria-label="对话列表">
+    <div class="drawer-head">
+      <div class="seal small" aria-hidden="true"><span>万</span></div>
+      <span class="brand small">万事通</span>
+      <button class="icon-btn" type="button" data-close="drawer" aria-label="关闭">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <button id="drawerNew" class="btn block" type="button">＋ 新对话</button>
+    <input id="convoSearch" class="search" type="search" placeholder="搜对话" aria-label="搜对话">
+    <div id="convoList" class="convo-list"></div>
+    <div class="drawer-foot">
+      <button id="btnSettings" class="row-btn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg>
+        <span>设置</span>
+        <span id="balance" class="balance"></span>
+      </button>
+    </div>
+  </aside>
+</div>
+
+<!-- sheets -->
+<div id="sheetPlus" class="sheet" hidden>
+  <div class="scrim" data-close="sheetPlus"></div>
+  <div class="sheet-panel" role="dialog" aria-label="添加">
+    <div class="grabber"></div>
+    <div class="plus-grid">
+      <button type="button" class="plus-item" data-pick="camera">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>拍照</span>
+      </button>
+      <button type="button" class="plus-item" data-pick="photos">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M5 17l4.5-4.5 3 3L15 13l4 4"/></svg><span>相册</span>
+      </button>
+      <button type="button" class="plus-item" data-pick="docs">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>文件</span>
+      </button>
+    </div>
+    <div class="mode-list">
+      <button type="button" class="mode-item" data-mode="draw">
+        <span class="mode-ic">🎨</span>
+        <span class="mode-txt"><b>画图模式</b><small>直接把你的话交给画图模型；附上照片就是改图</small></span>
+        <span class="switch" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="mode-item" data-mode="web">
+        <span class="mode-ic">🌐</span>
+        <span class="mode-txt"><b>一定要上网查</b><small>平时它会自己判断；开了这个就每题都先查</small></span>
+        <span class="switch" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="mode-item" data-mode="consult">
+        <span class="mode-ic">🧠</span>
+        <span class="mode-txt"><b>多 AI 会诊</b><small>同时问 3 个 AI，再综合成一个答案（较贵、较慢）</small></span>
+        <span class="switch" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="sheetModel" class="sheet tall" hidden>
+  <div class="scrim" data-close="sheetModel"></div>
+  <div class="sheet-panel" role="dialog" aria-label="选择模型">
+    <div class="grabber"></div>
+    <div class="sheet-title">
+      <h2>选 AI 大脑</h2>
+      <button class="icon-btn" type="button" data-close="sheetModel" aria-label="关闭"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <input id="modelSearch" class="search" type="search" placeholder="搜全部模型：claude、gemini、muse…" aria-label="搜模型">
+    <div id="modelList" class="model-list"></div>
+  </div>
+</div>
+
+<div id="sheetSettings" class="sheet full" hidden>
+  <div class="sheet-panel" role="dialog" aria-label="设置">
+    <div class="sheet-title sticky">
+      <button class="icon-btn" type="button" data-close="sheetSettings" aria-label="返回"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <h2>设置</h2>
+      <span></span>
+    </div>
+    <div id="settingsBody" class="settings"></div>
+  </div>
+</div>
+
+<div id="voiceOverlay" class="voice" hidden>
+  <div class="voice-top">
+    <span id="voiceModel" class="voice-model"></span>
+    <button id="voiceClose" class="icon-btn" type="button" aria-label="结束语音对话"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <button id="voiceOrb" class="orb" type="button" aria-label="语音状态">
+    <span class="orb-ring"></span><span class="orb-core"></span>
+  </button>
+  <p id="voiceState" class="voice-state">准备好了</p>
+  <p id="voiceHeard" class="voice-heard"></p>
+  <p id="voiceReply" class="voice-reply"></p>
+  <div class="voice-bottom">
+    <button id="voiceMute" class="pill" type="button">暂停听</button>
+    <button id="voiceEnd" class="pill danger" type="button">结束</button>
+  </div>
+</div>
+
+<div id="viewer" class="viewer" hidden>
+  <img id="viewerImg" alt="">
+  <div class="viewer-bar">
+    <button id="viewerSave" class="pill" type="button">保存 / 分享</button>
+    <button class="pill" type="button" data-close="viewer">关闭</button>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" hidden></div>
+
+<input id="fileCamera" type="file" accept="image/*" capture="environment" hidden>
+<input id="filePhotos" type="file" accept="image/*" multiple hidden>
+<input id="fileDocs" type="file" accept=".pdf,.docx,.xlsx,.xls,.csv,.txt,.md,.json,.html,.xml,application/pdf,text/plain,text/csv,image/*" multiple hidden>
+<input id="fileImport" type="file" accept="application/json,.json" hidden>
+</body>
+</html>
